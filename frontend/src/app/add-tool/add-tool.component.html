@@ -1,0 +1,248 @@
+<div *ngIf="isLoggedIn">
+    <mat-card class="border-title">
+    <h1>Add Tool:</h1>
+    </mat-card>
+    <br>
+    <br>
+    <div *ngIf="!isMobile" fxLayout="column" fxLayoutAlign="space-around center" class="matCard">
+        <mat-card class="border-form">
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Name of the tool</mat-label>
+                    <input matInput placeholder="Scissor" [formControl]="toolName" required>
+                    @if (toolName.invalid) {
+                        <mat-error>{{getErrorMessage("f")}}</mat-error>
+                        }
+                    <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+                </mat-form-field>
+                <div class="contentTwo">
+                    <label for="imageInput" class="image-upload-container">
+                      <span>Select Images</span><br>
+                      <input #imageInput
+                             id="imageInput"
+                             type="file"
+                             accept="image/*"
+                             multiple
+                             (change)="processFiles(imageInput)">
+                    </label>
+                </div>
+                <br>
+                <div class="file-previews">
+                    <div *ngFor="let file of uploadedFiles; let i = index" class="file-preview">
+                      <div class="image-container">
+                        <img [src]="file.url" alt="Uploaded File">
+                        <button (click)="removeFile(i)" class="delete-button">Delete</button>
+                      </div>
+                    </div>
+                  </div>
+                  
+                <br>
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Description</mat-label>
+                    <input matInput placeholder="Doe" [formControl]="description" required>
+                    @if (description.invalid) {
+                        <mat-error>{{getErrorMessage("f")}}</mat-error>
+                    }
+                    <mat-icon matSuffix>description</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Rental Rate (per Day)</mat-label>
+                    <input matInput placeholder="10" [formControl]="rentalRate" required>
+                    @if (rentalRate.invalid) {
+                    <mat-error>{{getErrorMessage("email")}}</mat-error>
+                    }
+                    <mat-icon matSuffix>money</mat-icon>
+                </mat-form-field>
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Condition</mat-label>
+                    <mat-select [ngModel]="condition" required>
+                      @for (condition of conditions; track condition) {
+                        <mat-option [value]="condition.value">{{condition.viewValue}}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Choose Kiosk</mat-label>
+                    <mat-select [ngModel]="kiosk" required>
+                      @for (kiosk of kiosks; track kiosk) {
+                        <mat-option [value]="kiosk.value">{{kiosk.viewValue}}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                  <mat-form-field appearance="outline" class="form-field">
+                    <mat-label>Choose Category</mat-label>
+                    <mat-select [ngModel]="category" required>
+                      @for (category of categories; track category) {
+                        <mat-option [value]="category.value">{{category.viewValue}}</mat-option>
+                      }
+                    </mat-select>
+                  </mat-form-field>
+                <mat-form-field class="form-field">
+                    <div class="content">
+                        <mat-label>Enter a date range when a tool is avaiable (If empty, the tool is always avaiable)</mat-label>
+                        <mat-date-range-input 
+                            [min]="today" 
+                            [formGroup]="range" 
+                            [rangePicker]="picker">
+                        <input matStartDate formControlName="start" placeholder="Start date">
+                        <input matEndDate formControlName="end" placeholder="End date">
+                        </mat-date-range-input>
+                        <mat-hint>DD/MM/YYYY</mat-hint>
+                        <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                        <mat-date-range-picker #picker></mat-date-range-picker>
+                        @if (range.controls.start.hasError('matStartDateInvalid')) {
+                        <mat-error>Invalid start date</mat-error>
+                        }
+                        @if (range.controls.end.hasError('matEndDateInvalid')) {
+                        <mat-error>Invalid end date</mat-error>
+                        }
+                        <br>
+                        <br>
+                        <button class="myButton" (click) = "onAddButtonClick()" mat-button>Add Time Range</button>
+                        <br>
+                        <br>
+                    </div>
+                    <div class="content">
+                        <mat-label>Dates of Avaiability</mat-label>
+                        <mat-chip-grid #chipGrid aria-label="Enter fruits">
+                        @for (date of filteredDates.slice(1); track date) {
+                            <mat-chip-row
+                            (removed)="remove(date)"
+                            [editable]="false">
+                            {{date.start + " - " + date.end}}
+                            <button matChipRemove [attr.aria-label]="'remove ' + date.start">
+                                <mat-icon>cancel</mat-icon>
+                            </button>
+                            </mat-chip-row>
+                        }
+                        <br><br>
+                        </mat-chip-grid>
+                    </div>
+                    </mat-form-field>
+            <button class="myButton" mat-button (click)="createTool()"> Create Tool </button>
+        </mat-card>
+    </div>
+
+    <div *ngIf="isMobile" fxLayout="column" fxLayoutAlign="space-around center" >
+            <mat-card class="border-form-mobile">
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Name of the tool</mat-label>
+                <input matInput placeholder="Scissor" [formControl]="toolName" required>
+                @if (toolName.invalid) {
+                    <mat-error>{{getErrorMessage("f")}}</mat-error>
+                    }
+                <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+            </mat-form-field>
+            <div class="contentTwo">
+                <label for="imageInput" class="image-upload-container">
+                  <span>Select Images</span><br>
+                  <input #imageInput
+                         id="imageInput"
+                         type="file"
+                         accept="image/*"
+                         multiple
+                         (change)="processFiles(imageInput)">
+                </label>
+            </div>
+            <br>
+            <div class="file-previews">
+                <div *ngFor="let file of uploadedFiles; let i = index" class="file-preview">
+                  <div class="image-container">
+                    <img [src]="file.url" alt="Uploaded File">
+                    <button (click)="removeFile(i)" class="delete-button">Delete</button>
+                  </div>
+                </div>
+              </div>
+              
+            <br>
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Description</mat-label>
+                <input matInput placeholder="Doe" [formControl]="description" required>
+                @if (description.invalid) {
+                    <mat-error>{{getErrorMessage("f")}}</mat-error>
+                }
+                <mat-icon matSuffix>description</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Rental Rate (per Day)</mat-label>
+                <input matInput placeholder="10" [formControl]="rentalRate" required>
+                @if (rentalRate.invalid) {
+                <mat-error>{{getErrorMessage("email")}}</mat-error>
+                }
+                <mat-icon matSuffix>money</mat-icon>
+            </mat-form-field>
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Condition</mat-label>
+                <mat-select [ngModel]="condition" required>
+                  @for (condition of conditions; track condition) {
+                    <mat-option [value]="condition.value">{{condition.viewValue}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Choose Kiosk</mat-label>
+                <mat-select [ngModel]="kiosk" required>
+                  @for (kiosk of kiosks; track kiosk) {
+                    <mat-option [value]="kiosk.value">{{kiosk.viewValue}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field appearance="outline" class="form-field">
+                <mat-label>Choose Category</mat-label>
+                <mat-select [ngModel]="category" required>
+                  @for (category of categories; track category) {
+                    <mat-option [value]="category.value">{{category.viewValue}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            <mat-form-field class="form-field">
+                <div class="content">
+                    <mat-label>Enter a date range when a tool is avaiable (If empty, the tool is always avaiable)</mat-label>
+                    <mat-date-range-input 
+                        [min]="today" 
+                        [formGroup]="range" 
+                        [rangePicker]="picker">
+                    <input matStartDate formControlName="start" placeholder="Start date">
+                    <input matEndDate formControlName="end" placeholder="End date">
+                    </mat-date-range-input>
+                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                    <mat-date-range-picker #picker></mat-date-range-picker>
+                    @if (range.controls.start.hasError('matStartDateInvalid')) {
+                    <mat-error>Invalid start date</mat-error>
+                    }
+                    @if (range.controls.end.hasError('matEndDateInvalid')) {
+                    <mat-error>Invalid end date</mat-error>
+                    }
+                    <br>
+                    <br>
+                    <button class="myButton" (click) = "onAddButtonClick()" mat-button>Add Time Range</button>
+                    <br>
+                    <br>
+                </div>
+                <div class="content">
+                    <mat-label>Dates of Avaiability</mat-label>
+                    <mat-chip-grid #chipGrid aria-label="Enter fruits">
+                    @for (date of filteredDates.slice(1); track date) {
+                        <mat-chip-row
+                        (removed)="remove(date)"
+                        [editable]="false">
+                        {{date.start + " - " + date.end}}
+                        <button matChipRemove [attr.aria-label]="'remove ' + date.start">
+                            <mat-icon>cancel</mat-icon>
+                        </button>
+                        </mat-chip-row>
+                    }
+                    <br><br>
+                    </mat-chip-grid>
+                </div>
+                </mat-form-field>
+        <button class="myButton" mat-button (click)="createTool()"> Create Tool </button>
+            </mat-card>
+        </div>
+    <div>
+    </div>
+</div>
+<div *ngIf="!isLoggedIn">
+    <h1>Unauthorized, you have to login</h1>
+</div>
+

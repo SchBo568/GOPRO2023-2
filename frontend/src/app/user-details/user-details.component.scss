@@ -1,0 +1,64 @@
+.border-title {
+    padding-top: 10px;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    text-align: center;
+    background-color: #fbfbfb;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.border-form {
+    //border: 3px solid #673ab7;
+    padding-top: 5%;
+    padding-left: 10%;
+    padding-right: 10%;
+    padding-bottom: 5%;
+    background-color: #fbfbfb;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  .border-form-mobile {
+    //border: 3px solid #673ab7;
+    padding-top: 10%;
+    padding-left: 1%;
+    padding-right: 1%;
+    padding-bottom: 10%;
+    background-color: #fbfbfb;
+    box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+  }
+
+  
+.form-field {
+    flex: 1; /* Allows fields to take up equal space */
+    margin-right: 10px; /* Adjust space between fields */
+    margin-left: 10px;
+  }
+
+h1 {
+    text-align: center;
+  }
+
+  .myButton {
+	background-color:#683ab7;
+	border-radius:8px;
+	border:1px solid #683ab7;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:17px;
+	padding:14px 40px;
+	text-decoration:none;
+}
+
+.myButton:hover {
+	background-color:#5020a2 !important;
+}
+
+.myButton:active {
+	position:relative;
+	top:1px;
+}
+
+mat-form-field {
+  margin-right: 12px;
+}

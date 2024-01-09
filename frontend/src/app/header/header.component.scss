@@ -1,0 +1,58 @@
+.navigator {
+    display: flex;
+    justify-content: left;
+    align-items: left;
+}
+
+.example-spacer {
+	flex: 1 1 auto;
+  }
+
+img {
+    max-width: 18%;
+    height: auto;
+}
+
+.mobile-img {
+    max-width: 50%;
+    height: auto;
+	align-content: right;
+}
+
+.myButton {
+	background-color:#683ab7;
+	border-radius:8px;
+	border:1px solid #683ab7;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:80%;
+	text-decoration:none;
+}
+.myButton:hover {
+	background-color:#5020a2 !important;
+	height: 55px;
+}
+.myButton:active {
+	position:relative;
+	top:1px;
+}
+
+.example-container {
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+  }
+  
+  .example-events {
+	width: 300px;
+	height: 200px;
+	overflow: auto;
+	border: 1px solid #555;
+  }
+
+
+  
