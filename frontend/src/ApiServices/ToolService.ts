@@ -6,6 +6,7 @@ import { ResponseStatus } from '../app/models/ResponseStatus';
 import { UserSession } from '../app/models/UserSession';
 import { CreateUserDto } from '../app/models/CreateUser';
 import { CreateToolDto } from '../app/models/CreateTool';
+import { GetToolDto } from '../app/models/GetTool';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,16 @@ export class ToolService {
   createTool(tool: CreateToolDto): Observable<any> {
     const headers = this.getHeaders();
     return this.http.post<any>(`${this.apiUrl}`, tool, { headers });
+  }
+
+  getToolsByOwner(username: string): Observable<GetToolDto[]> {
+    const headers = this.getHeaders();
+    return this.http.get<any>(`${this.apiUrl}/owner/${username}`, {headers})
+  }
+
+  editToolById(id: number, tool: CreateToolDto): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.put<any>(`${this.apiUrl}/${id}`, {tool}, {headers})
   }
 
 //   login(username: string, password: string) : Observable<UserSession> {

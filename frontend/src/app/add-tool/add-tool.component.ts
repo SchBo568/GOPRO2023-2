@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule, JsonPipe } from '@angular/common';
+import { CommonModule, DatePipe, JsonPipe } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
@@ -24,6 +24,8 @@ import { RangeDates } from './RangeDates.dto';
 import { CreateToolDto } from '../models/CreateTool';
 import { ToolService } from '../../ApiServices/ToolService';
 import { GetToolDto } from '../models/GetTool';
+import { DateRangeService } from '../../ApiServices/DateRangeService';
+import { CreateDateRangeDto } from '../models/CreateDateRange';
 //import { ImageService } from '../../ApiServices/ImageService';
 
 interface Condition {
@@ -41,6 +43,11 @@ interface ImageSnippet {
   file?: File | null
 }
 
+interface ImageBody {
+  file?: File | null,
+  toolId?: number | null
+}
+
 @Component({
   selector: 'app-add-tool',
   standalone: true,
@@ -50,12 +57,12 @@ interface ImageSnippet {
     ReactiveFormsModule,
     JsonPipe,
     MatNativeDateModule,MatButtonModule,],
-  providers: [KioskService, CategoryService, ImageService, ToolService],
+  providers: [KioskService, CategoryService, ImageService, ToolService, DateRangeService, DatePipe],
   templateUrl: './add-tool.component.html',
   styleUrl: './add-tool.component.scss'
 })
 export class AddToolComponent {
-  filteredDates: [RangeDates] = [{start: 'From', end: 'To'}];
+  filteredDates: [RangeDates] = [{start: new Date ('2023-10-24'), end: new Date ('2023-10-24')}];
   today: Date = new Date();
   isMobile: boolean = false;
   isLoggedIn?: boolean;
@@ -92,7 +99,9 @@ export class AddToolComponent {
     private kioskService: KioskService,
     private categoryService: CategoryService,
     private imageService: ImageService,
-    private toolService: ToolService
+    private toolService: ToolService,
+    private dateRangeService: DateRangeService,
+    private datePipe: DatePipe
     //private imageService: ImageService
   ) {}
 
@@ -120,7 +129,7 @@ export class AddToolComponent {
       var containsDuplicates = this.hasDuplicates(this.filteredDates);
       console.log("Duplicates: "+containsDuplicates)
       if(!containsDuplicates) {
-        this.filteredDates.push(new RangeDates(this.range.value.start!.toLocaleDateString(),this.range.value.end!.toLocaleDateString()));
+        this.filteredDates.push(new RangeDates(this.range.value.start!,this.range.value.end!));
       }
     }
   }
@@ -240,6 +249,8 @@ export class AddToolComponent {
       this.toolService.setToken(token);
       this.toolService.createTool(this.proTool).subscribe((response: GetToolDto) => {
         console.log(response.PK_tool_id)
+        this.upload(response.PK_tool_id)
+        this.createDateRange(response.PK_tool_id)
       })
     }
   }
@@ -253,15 +264,32 @@ export class AddToolComponent {
     }
     return code;
   }
-  
 
-  upload(toolId: number): void {
+  upload(toolId?: number): void {
+    this.imageService.setToken(this.sessionStorageService.getUser()?.access_token ?? "0000000000")
     if(this.uploadedFiles.length !== 0) {
         for(var i = 0; i< this.uploadedFiles.length; i++){
-          this.imageService.uploadFile(this.uploadedFiles[i].file).subscribe((response: string) => {
+          this.imageService.uploadFile(this.uploadedFiles[i].file, toolId ?? 1).subscribe((response: string) => {
           console.log(response)
         })
         }
+    }
+  }
+
+  dateRange: CreateDateRangeDto = {}
+
+  createDateRange(toolId?: number): void {
+    this.dateRangeService.setToken(this.sessionStorageService.getUser()?.access_token ?? "0000000000")
+    console.log(this.filteredDates.length)
+    if(this.filteredDates.length !== 1) {
+      for(var i = 1; i <= this.filteredDates.length; i++){
+        this.dateRange.start = this.datePipe.transform(new Date (this.filteredDates[i].start), 'yyyy-MM-dd') ?? "d";
+        this.dateRange.end = this.datePipe.transform(new Date (this.filteredDates[i].end), 'yyyy-MM-dd') ?? "dd";
+        this.dateRange.toolId = toolId;
+        this.dateRangeService.createDateRange(this.dateRange).subscribe((response: string) => {
+          console.log(response)
+        })
+      }
     }
   }
 }

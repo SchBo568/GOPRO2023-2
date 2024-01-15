@@ -7,10 +7,6 @@ export class CreateDateRangeDto {
   @IsNotEmpty()
   end: Date;
 
-  @IsString()
-  @IsNotEmpty()
-  mode: string
-
   @IsNumber()
   @IsNotEmpty()
   toolId: number;

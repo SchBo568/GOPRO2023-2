@@ -20,7 +20,6 @@ export class DateRangesService {
             const dateRange = new DateRange();
             dateRange.start = createDateRange.start;
             dateRange.end = createDateRange.end;
-            dateRange.mode = createDateRange.mode;
             dateRange.tool = tool;
             return this.dateRangeRepo.save(dateRange);
         } else {

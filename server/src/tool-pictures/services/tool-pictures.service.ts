@@ -17,12 +17,11 @@ export class ToolPicturesService {
 
     async uploadFile(file: Express.Multer.File, toolId: number): Promise<string> {
         const fileName = `${Date.now()}${extname(file.originalname)}`;
-        const path = `./tool2rent-pictures/${fileName}`;
+        const path = `./images/tool2rent-pictures/${fileName}`;
+        const savePath = `./tool2rent-pictures/${fileName}`;
 
         const tool: Tool = await this.toolsService.getTool(toolId);
-        console.log(tool.PK_tool_id)
-
-        console.log(this.toolPicRepo.create({imageUrl: path, tool: tool}))
+        this.toolPicRepo.save({imageUrl: savePath, tool: tool})
     
         const stream = createWriteStream(path);
         stream.write(file.buffer);
@@ -37,5 +36,10 @@ export class ToolPicturesService {
         } catch (error) {
           throw new Error(`Failed to delete file: ${error.message}`);
         }
+      }
+
+      async getFilesByToolId(toolId: number): Promise<ToolPicture[]> {
+        console.log("ID: "+toolId)
+        return this.toolPicRepo.find({where: {tool: {PK_tool_id: toolId}}})
       }
 }

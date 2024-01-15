@@ -53,17 +53,28 @@ export class KiosksService {
         //return this.kioskRepo.query(`SELECT * FROM kiosk WHERE distance <= ${distance}`);
     }
 
-    async getClosestKiosk(address: string): Promise<Kiosk[]> {
+    async getClosestKiosk(address: string): Promise<Kiosk> {
         const temp = await this.kioskRepo.find();
         const currentLocation = await this.coordinatesHandler.getCoordinates(address);
-        let result: Kiosk[] = [];
-        for (let i = 0; i < temp.length; i++) {
+        
+        if (temp.length === 0) {
+            throw new Error('No kiosks found');
+        }
+
+        let result: Kiosk = temp[0];
+        const firstKioskCoords = await this.coordinatesHandler.getCoordinates(result.address);
+        let closestDistance = await this.coordinatesHandler.getDistance(currentLocation.lat, currentLocation.lon, firstKioskCoords.lat, firstKioskCoords.lon);
+
+        for (let i = 1; i < temp.length; i++) {
             const element = temp[i];
             const elementCoords = await this.coordinatesHandler.getCoordinates(element.address);
             const distanceBetween = await this.coordinatesHandler.getDistance(currentLocation.lat, currentLocation.lon, elementCoords.lat, elementCoords.lon);
-            
+            if(distanceBetween < closestDistance){
+                closestDistance = distanceBetween;
+                result = element;
+            }
         }
 
-        return result
+        return result;
     }
 }

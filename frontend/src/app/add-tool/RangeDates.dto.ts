@@ -1,6 +1,6 @@
 export class RangeDates {
     constructor(
-        public start: string ,
-        public end: string 
+        public start: Date ,
+        public end: Date 
     ){}
 }

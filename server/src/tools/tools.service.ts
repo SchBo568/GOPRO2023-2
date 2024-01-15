@@ -14,7 +14,6 @@ export class ToolsService {
 
     constructor(@InjectRepository(Tool) private toolRepo: Repository<Tool>, private usersService: UsersService, private kiosksService: KiosksService, private categoriesService: CategoriesService){}
 
-
     async createTool(tool: CreateToolDto): Promise<any> {
         const user =  await this.usersService.findUserByUsername(tool.userPKUsername)
         const kiosk:Kiosk = await this.kiosksService.getKiosk(tool.kioskPKLocationId);
@@ -43,7 +42,7 @@ export class ToolsService {
     async getTool(id: number): Promise<Tool | undefined> {
         return this.toolRepo.findOne({
           where: { PK_tool_id: id },
-          relations: ['user', 'review', 'kiosk', 'category'],
+          relations: ['review', 'kiosk', 'category'],
         });
       }
 

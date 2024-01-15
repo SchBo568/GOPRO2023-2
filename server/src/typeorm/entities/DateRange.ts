@@ -7,13 +7,13 @@ export class DateRange {
     @PrimaryGeneratedColumn()
     PK_dateRange_id: number;
 
-    @Column()
+    @Column({type: "date"})
     start: Date;
 
-    @Column()
+    @Column({type: "date"})
     end: Date;
     
-    @Column()
+    @Column({nullable: true})
     mode: string
 
     @ManyToOne(() => Tool, tool => tool.dateRanges)

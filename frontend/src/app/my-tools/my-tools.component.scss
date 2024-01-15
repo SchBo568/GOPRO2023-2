@@ -1,0 +1,51 @@
+.margin-mat-card {
+  padding-left: 2.5%;
+  padding-right: 2.5%;
+}
+
+.border-title {
+  padding-top: 10px;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+  text-align: center;
+  background-color: #fbfbfb;
+  box-shadow: 0 2px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+
+.border-form {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%; /* Optional: Adjust the width as needed */
+}
+
+.image-container {
+  flex: 0 0 auto; /* Allow image to grow/shrink but not stretch */
+  margin-right: 16px; /* Adjust margin as needed */
+}
+
+.image-container img {
+  width: 50px; /* Set the width of the image */
+  height: auto; /* Maintain aspect ratio */
+}
+
+/* Example CSS styling */
+.custom-icon-button {/* Set your desired background color */
+  color: #000000; /* Set your desired text/icon color */
+  border-radius: 10%; /* Make it a circle */
+  padding: 1px; /* Adjust padding as needed */
+  border: none;
+  background-color: #fbfbfb;
+  transition: background-color 0.3s ease; /* Add a smooth transition on hover */
+
+  /* Add additional styling as needed */
+}
+
+.custom-icon-button:hover {
+  background-color: #d5d5d5; /* Change background color on hover */
+}
+
+.truncate-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+

@@ -85,6 +85,11 @@ export class HeaderComponent {
     this.router.navigate(['/add-tool'])
   }
 
+  navigateMyTools() {
+    console.log("Clicked")
+    this.router.navigate(['/my-tools'])
+  }
+
   demoLogout() {
     this.sessionStorageService.clearUser();
     this.isLoggedIn = false;

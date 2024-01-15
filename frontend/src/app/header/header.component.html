@@ -4,7 +4,7 @@
             <img src="assets/logo.png">
             <button *ngIf="!isLoggedIn" class="myButton" mat-button>Overview</button>
             <button *ngIf="isLoggedIn" class="myButton" (click)="navigateAddTool()" mat-button>Add Tool</button>
-            <button *ngIf="isLoggedIn" class="myButton" mat-button>My Tools</button>
+            <button *ngIf="isLoggedIn" class="myButton" (click)="navigateMyTools()" mat-button>My Tools</button>
             <button *ngIf="isLoggedIn" class="myButton" mat-button>Rented Tools</button>
             <button class="myButton" mat-button>Kiosks</button>
             <button class="myButton" mat-button>Categories</button>
@@ -22,8 +22,8 @@
         <button mat-icon-button class="example-icon" [matMenuTriggerFor]="menu"><mat-icon>menu</mat-icon></button>
         <img class="mobile-img" src="assets/logo.png">
         <mat-menu #menu="matMenu">
-        <button mat-menu-item>Add Tool</button>
-        <button *ngIf="isLoggedIn" mat-menu-item >My Tools</button>
+        <button *ngIf="isLoggedIn" (click)="navigateAddTool()" mat-menu-item>Add Tool</button>
+        <button *ngIf="isLoggedIn" (click)="navigateMyTools()" mat-menu-item >My Tools</button>
         <button *ngIf="isLoggedIn" mat-menu-item >Rented Tools</button>
         <button mat-menu-item >Kiosks</button>
         <button mat-menu-item >Categories</button>

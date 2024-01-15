@@ -43,7 +43,7 @@ export class Tool {
     @ManyToOne(() => Category, category => category.tools)
     category: Category
     
-    @OneToMany(() => ToolPicture, toolPicture => toolPicture, { onDelete: 'CASCADE', onUpdate: 'CASCADE'})
+    @OneToMany(() => ToolPicture, toolPicture => toolPicture.tool, { onDelete: 'CASCADE', onUpdate: 'CASCADE'})
     pictures: ToolPicture[];
 
     @OneToMany(() => DateRange, dateRange => dateRange.tool, { onDelete: 'CASCADE', onUpdate: 'CASCADE'})

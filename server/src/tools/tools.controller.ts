@@ -64,10 +64,9 @@ export class ToolsController {
 
     @UseGuards(AuthGuard)
     @Get('/owner/:username')
-    async getToolByUsername(@Param('username') username: string): Promise<any> {
+    async getToolByUsername(@Param('username') username: string): Promise<Tool[] | any> {
         try{
-            let data = await this.toolsService.getToolsByOwner(username);
-            return this.sendResponse(data, "Tool")
+            return await this.toolsService.getToolsByOwner(username);
         }
         catch(e){
             return this.sendResponse(null, e.message)
