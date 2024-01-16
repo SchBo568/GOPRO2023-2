@@ -33,7 +33,7 @@ export class ModalLoginComponent {
   sessionStorageService: SessionStorageService = new SessionStorageService;
   constructor(
     public dialogRef: MatDialogRef<ModalLoginComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: DialogData, public authService: AuthService, private _snackBar: MatSnackBar, 
+    @Inject(MAT_DIALOG_DATA) public data: DialogData, public authService: AuthService, private _snackBar: MatSnackBar,
   ) { }
 
   onCancelClick(): void {
@@ -44,11 +44,12 @@ export class ModalLoginComponent {
     if (this.username.value != "" && this.password.value != "") {
       console.log("Username: " + this.username.value + ", Password: " + this.password.value)
       //this.userService.setToken(this.data.token);
-      this.authService.login(this.username.value ?? "t", this.password.value ?? "t").subscribe((response: UserSession) => {
+      this.authService.login(this.username.value ?? "t", this.password.value ?? "t").subscribe((response: any) => {
+        response = response.user
         console.log(response.email)
         if (response.email != undefined) {
           this.sessionStorageService.saveUser(
-            { 
+            {
               PK_username: response.PK_username,
               email: response.email,
               firstname: response.firstname,
@@ -71,13 +72,13 @@ export class ModalLoginComponent {
   password = new FormControl('', Validators.required);
 
   /* getErrorMessage() {
-    return 'Username and/or Password is/are incorrect!' 
+    return 'Username and/or Password is/are incorrect!'
   }
 
   openSnackBar(message: string | null, style: string) {
     const config = new MatSnackBarConfig();
     config.verticalPosition = 'bottom';
-    config.horizontalPosition = 'start'; 
+    config.horizontalPosition = 'start';
     config.duration = 2000;
     config.panelClass = [style];
 

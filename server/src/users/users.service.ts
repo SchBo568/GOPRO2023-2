@@ -1,13 +1,12 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { User } from 'src/typeorm/entities/User';
-import { CreateUserParams } from 'src/utils/types';
-import { Repository } from 'typeorm';
+import {Injectable, UnauthorizedException} from '@nestjs/common';
+import {InjectRepository} from '@nestjs/typeorm';
+import {User} from 'src/typeorm/entities/User';
+import {Repository} from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Kiosk } from 'src/typeorm/entities/Kiosk';
-import { CreateUserDto } from './CreateUser.dto';
-import { UpdateUserDto } from './UpdateUser.dto';
-import { sendMail } from 'src/utils/mailService';
+import {Kiosk} from 'src/typeorm/entities/Kiosk';
+import {CreateUserDto} from './CreateUser.dto';
+import {UpdateUserDto} from './UpdateUser.dto';
+import {sendMail} from 'src/utils/mailService';
 
 @Injectable()
 export class UsersService {
@@ -28,26 +27,39 @@ export class UsersService {
   }
 
   async checkPassword(password: string, hashedPassword: string) {
-    const result = await bcrypt.compare(password, hashedPassword)    
-    return result;
+    return await bcrypt.compare(password, hashedPassword);
   }
 
-  async login(loginParams: {PK_username: string, password: string}) {
+  async login(loginParams: {PK_username: string, password: string})  {
     const temp = await this.findUserByUsername(loginParams.PK_username)
     if (!temp) {
-      return "This user has not been found";
+      return {
+        "status": "Bad Request",
+        "code": 400,
+        "message": ["This user does not exist"]
+
+      };
     } else {
-      const user=temp[0];
-      
+      const user = temp[0];
+
       const isPasswordCorrect = await this.checkPassword(
-        loginParams.password,
-        user.password,
+          loginParams.password,
+          user.password,
       );
-      
+
       if (isPasswordCorrect) {
-        return user;
+        return {
+          "status": "OK",
+          "code": 200,
+          "message": ["Login successful"],
+          "user": user
+        };
       } else {
-        throw new UnauthorizedException();
+        return {
+          "status": "Bad Request",
+          "code": 400,
+          "message": ["Incorrect password"]
+        };
       }
     }
   }
