@@ -29,40 +29,41 @@
             <!-- Use *ngFor to iterate over your tools array -->
             @for (tool of registeredTools; track tool) {
               <br>
-                <mat-card class="border-title">
-                  <mat-card-content class="flex-container">
-                    <mat-grid-list cols="4" rowHeight="50px">
+              <mat-card class="border-title">
+                <mat-card-content class="flex-container">
+                  <mat-grid-list cols="4" rowHeight="50px">
                     <div fxLayout="row" fxLayoutAlign="start space-around">
-                    <mat-grid-tile>
-                      <div class="image-container">
-                        <img [src]="tool.src">
-                      </div>
-                    </mat-grid-tile>
-                    <mat-grid-tile>
-                      <p>{{ tool.name }}</p>
-                    </mat-grid-tile>
-                    <mat-grid-tile>
-                      <p class="truncate-text">{{ tool.description }}</p>
-                    </mat-grid-tile>
+                      <mat-grid-tile>
+                        <div class="image-container">
+                          <img [src]="tool.src">
+                        </div>
+                      </mat-grid-tile>
+                      <mat-grid-tile>
+                        <p>{{ tool.name }}</p>
+                      </mat-grid-tile>
+                      <mat-grid-tile>
+                        <p class="truncate-text">{{ tool.description }}</p>
+                      </mat-grid-tile>
                     </div>
                     <mat-grid-tile>
                       <div fxLayout="row" fxLayoutAlign="end space-around">
-                        <button mat-icon-button [matMenuTriggerFor]="menu" class="custom-icon-button mat-flat-button">
+                        <button mat-icon-button class="custom-icon-button mat-flat-button" (click)="onButtonClick(tool.id)" [matMenuTriggerFor]="menu">
                           <mat-icon>more_vert</mat-icon>
                         </button>
                         <mat-menu #menu="matMenu">
-                          <button mat-icon-button mat-menu-item>Maintain <mat-icon>build</mat-icon></button>
-                          <button mat-icon-button mat-menu-item>Publish <mat-icon>add</mat-icon></button>
-                          <button mat-icon-button mat-menu-item>Edit <mat-icon>edit</mat-icon></button>
-                          <button mat-icon-button mat-menu-item>Delete <mat-icon>delete</mat-icon></button>
+                          <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Under Maintainance', tool.id)">Maintain <mat-icon>build</mat-icon></button>
+                          <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Published', tool.id)">Publish <mat-icon>login</mat-icon></button>
+                          <button mat-icon-button mat-menu-item (click)="onMenuClickUpdate(tool.id)">Edit <mat-icon>edit</mat-icon></button>
+                          <button mat-icon-button mat-menu-item (click)="onMenuClick('Delete', tool.id)">Delete <mat-icon>delete</mat-icon></button>
                         </mat-menu>
                       </div>
                     </mat-grid-tile>
-                    </mat-grid-list>
-                  </mat-card-content>
-                </mat-card>
-                <br>
+                  </mat-grid-list>
+                </mat-card-content>
+              </mat-card>
+              <br>
             }
+            
         </div>
 
         <br>
@@ -71,7 +72,7 @@
       <div *ngIf="isMobile">
         <br>
             <div fxLayout="column" fxLayoutAlign="center" class="margin-mat-card">
-              <mat-card class="border-title-title">
+              <mat-card class="border-title">
                 <mat-card-content class="flex-container">
                   <mat-grid-list cols="4" rowHeight="50px">
                   <div fxLayout="row" fxLayoutAlign="start space-around">
@@ -115,12 +116,14 @@
                       </div>
                       <mat-grid-tile>
                         <div fxLayout="row" fxLayoutAlign="end space-around">
-                          <button mat-icon-button [matMenuTriggerFor]="menu" class="custom-icon-button mat-flat-button">
+                          <button mat-icon-button class="custom-icon-button mat-flat-button" (click)="onButtonClick(tool.id)" [matMenuTriggerFor]="menu">
                             <mat-icon>more_vert</mat-icon>
                           </button>
                           <mat-menu #menu="matMenu">
-                            <button mat-menu-item>Item 1</button>
-                            <button mat-menu-item>Item 2</button>
+                            <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Under Maintainance', tool.id)">Maintain <mat-icon>build</mat-icon></button>
+                            <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Published', tool.id)">Publish <mat-icon>login</mat-icon></button>
+                            <button mat-icon-button mat-menu-item (click)="onMenuClickUpdate(tool.id)">Edit <mat-icon>edit</mat-icon></button>
+                            <button mat-icon-button mat-menu-item (click)="onMenuClick('Delete', tool.id)">Delete <mat-icon>delete</mat-icon></button>
                           </mat-menu>
                         </div>
                       </mat-grid-tile>
@@ -135,9 +138,143 @@
         </div>
     </mat-tab>
     <mat-tab label="Published">
+      <div *ngIf="!isMobile">
+        <br>
+          <div fxLayout="column" fxLayoutAlign="center" class="margin-mat-card">
+            <mat-card class="border-title">
+              <mat-card-content class="flex-container">
+                <mat-grid-list cols="4" rowHeight="50px">
+                <div fxLayout="row" fxLayoutAlign="start space-around">
+                <mat-grid-tile>
+                  <div class="image-container">
+                    <p><b>Picture</b></p>
+                  </div>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                  <p><b>Name</b></p>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                  <p><b>Description</b></p>
+                </mat-grid-tile>
+                </div>
+                <mat-grid-tile>
+                  <p><b>Actions</b></p>
+                </mat-grid-tile>
+                </mat-grid-list>
+              </mat-card-content>
+            </mat-card>
+            <br>
+              <!-- Use *ngFor to iterate over your tools array -->
+              @for (tool of publishedTools; track tool) {
+                <br>
+                <mat-card class="border-title">
+                  <mat-card-content class="flex-container">
+                    <mat-grid-list cols="4" rowHeight="50px">
+                      <div fxLayout="row" fxLayoutAlign="start space-around">
+                        <mat-grid-tile>
+                          <div class="image-container">
+                            <img [src]="tool.src">
+                          </div>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p>{{ tool.name }}</p>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p class="truncate-text">{{ tool.description }}</p>
+                        </mat-grid-tile>
+                      </div>
+                      <mat-grid-tile>
+                        <div fxLayout="row" fxLayoutAlign="end space-around">
+                          <button mat-icon-button class="custom-icon-button mat-flat-button" (click)="onButtonClick(tool.id)" [matMenuTriggerFor]="menu">
+                            <mat-icon>more_vert</mat-icon>
+                          </button>
+                          <mat-menu #menu="matMenu">
+                            <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Under Maintainance', tool.id)">Maintain <mat-icon>build</mat-icon></button>
+                            <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Registered', tool.id)">Take from Kiosk <mat-icon>logout</mat-icon></button>
+                          </mat-menu>
+                        </div>
+                      </mat-grid-tile>
+                    </mat-grid-list>
+                  </mat-card-content>
+                </mat-card>
+                <br>
+              }
+              
+          </div>
+  
+          <br>
+        </div>
+  
+        <div *ngIf="isMobile">
+          <br>
+              <div fxLayout="column" fxLayoutAlign="center" class="margin-mat-card">
+                <mat-card class="border-title-title">
+                  <mat-card-content class="flex-container">
+                    <mat-grid-list cols="4" rowHeight="50px">
+                    <div fxLayout="row" fxLayoutAlign="start space-around">
+                    <mat-grid-tile>
+                      <div class="image-container">
+                        <p class="truncate-text"><b>Picture</b></p>
+                      </div>
+                    </mat-grid-tile>
+                    <mat-grid-tile>
+                      <p class="truncate-text"><b>Name</b></p>
+                    </mat-grid-tile>
+                    <mat-grid-tile>
+                      <p class="truncate-text"><b>Description</b></p>
+                    </mat-grid-tile>
+                    </div>
+                    <mat-grid-tile>
+                      <p class="truncate-text"><b>Actions</b></p>
+                    </mat-grid-tile>
+                    </mat-grid-list>
+                  </mat-card-content>
+                </mat-card>
+                <br>
+                <!-- Use *ngFor to iterate over your tools array -->
+                @for (tool of publishedTools; track tool) {
+                  <br>
+                    <mat-card class="border-title">
+                      <mat-card-content class="flex-container">
+                        <mat-grid-list cols="4" rowHeight="50px">
+                        <div fxLayout="row" fxLayoutAlign="start space-around">
+                        <mat-grid-tile>
+                          <div class="image-container">
+                            <img [src]="tool.src">
+                          </div>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p>{{ tool.name }}</p>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p class="truncate-text">{{ tool.description }}</p>
+                        </mat-grid-tile>
+                        </div>
+                        <mat-grid-tile>
+                          <div fxLayout="row" fxLayoutAlign="end space-around">
+                            <button mat-icon-button class="custom-icon-button mat-flat-button" (click)="onButtonClick(tool.id)" [matMenuTriggerFor]="menu">
+                              <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu">
+                              <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Under Maintainance', tool.id)">Maintain <mat-icon>build</mat-icon></button>
+                              <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Registered', tool.id)">Take from Kiosk <mat-icon>logout</mat-icon></button>
+                            </mat-menu>
+                          </div>
+                        </mat-grid-tile>
+                        </mat-grid-list>
+                      </mat-card-content>
+                    </mat-card>
+                    <br>
+                }
+            </div>
+    
+            <br>
+          </div>
+      </mat-tab>
+    <mat-tab label="In Payment">
       <br>
       <mat-card class="border-form">
-        <img src="/home/gopro/GOPRO2023/server/images/1704833816742.png">
+        <mat-card-content>Simple card</mat-card-content>
       </mat-card>
       <br>
     </mat-tab>
@@ -149,10 +286,145 @@
       <br>
     </mat-tab>
     <mat-tab label="Maintainance">
-      <br>
-      <mat-card class="border-form">
-        <mat-card-content>Simple card</mat-card-content>
-      </mat-card>
-      <br>
-    </mat-tab>
+      <div *ngIf="!isMobile">
+        <br>
+          <div fxLayout="column" fxLayoutAlign="center" class="margin-mat-card">
+            <mat-card class="border-title">
+              <mat-card-content class="flex-container">
+                <mat-grid-list cols="4" rowHeight="50px">
+                <div fxLayout="row" fxLayoutAlign="start space-around">
+                <mat-grid-tile>
+                  <div class="image-container">
+                    <p><b>Picture</b></p>
+                  </div>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                  <p><b>Name</b></p>
+                </mat-grid-tile>
+                <mat-grid-tile>
+                  <p><b>Description</b></p>
+                </mat-grid-tile>
+                </div>
+                <mat-grid-tile>
+                  <p><b>Actions</b></p>
+                </mat-grid-tile>
+                </mat-grid-list>
+              </mat-card-content>
+            </mat-card>
+            <br>
+              <!-- Use *ngFor to iterate over your tools array -->
+              @for (tool of maintainanceTools; track tool) {
+                <br>
+                <mat-card class="border-title">
+                  <mat-card-content class="flex-container">
+                    <mat-grid-list cols="4" rowHeight="50px">
+                      <div fxLayout="row" fxLayoutAlign="start space-around">
+                        <mat-grid-tile>
+                          <div class="image-container">
+                            <img [src]="tool.src">
+                          </div>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p>{{ tool.name }}</p>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p class="truncate-text">{{ tool.description }}</p>
+                        </mat-grid-tile>
+                      </div>
+                      <mat-grid-tile>
+                        <div fxLayout="row" fxLayoutAlign="end space-around">
+                          <button mat-icon-button class="custom-icon-button mat-flat-button" (click)="onButtonClick(tool.id)" [matMenuTriggerFor]="menu">
+                            <mat-icon>more_vert</mat-icon>
+                          </button>
+                          <mat-menu #menu="matMenu">
+                            <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Published', tool.id)">Publish <mat-icon>login</mat-icon></button>
+                            <button mat-icon-button mat-menu-item (click)="onMenuClickUpdate(tool.id)">Edit <mat-icon>edit</mat-icon></button>
+                            <button mat-icon-button mat-menu-item (click)="onMenuClick('Delete', tool.id)">Delete <mat-icon>delete</mat-icon></button>
+                          </mat-menu>
+                        </div>
+                      </mat-grid-tile>
+                    </mat-grid-list>
+                  </mat-card-content>
+                </mat-card>
+                <br>
+              }
+              
+          </div>
+  
+          <br>
+        </div>
+  
+        <div *ngIf="isMobile">
+          <br>
+              <div fxLayout="column" fxLayoutAlign="center" class="margin-mat-card">
+                <mat-card class="border-title-title">
+                  <mat-card-content class="flex-container">
+                    <mat-grid-list cols="4" rowHeight="50px">
+                    <div fxLayout="row" fxLayoutAlign="start space-around">
+                    <mat-grid-tile>
+                      <div class="image-container">
+                        <p class="truncate-text"><b>Picture</b></p>
+                      </div>
+                    </mat-grid-tile>
+                    <mat-grid-tile>
+                      <p class="truncate-text"><b>Name</b></p>
+                    </mat-grid-tile>
+                    <mat-grid-tile>
+                      <p class="truncate-text"><b>Description</b></p>
+                    </mat-grid-tile>
+                    </div>
+                    <mat-grid-tile>
+                      <p class="truncate-text"><b>Actions</b></p>
+                    </mat-grid-tile>
+                    </mat-grid-list>
+                  </mat-card-content>
+                </mat-card>
+                <br>
+                <!-- Use *ngFor to iterate over your tools array -->
+                @for (tool of maintainanceTools; track tool) {
+                  <br>
+                    <mat-card class="border-title">
+                      <mat-card-content class="flex-container">
+                        <mat-grid-list cols="4" rowHeight="50px">
+                        <div fxLayout="row" fxLayoutAlign="start space-around">
+                        <mat-grid-tile>
+                          <div class="image-container">
+                            <img [src]="tool.src">
+                          </div>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p>{{ tool.name }}</p>
+                        </mat-grid-tile>
+                        <mat-grid-tile>
+                          <p class="truncate-text">{{ tool.description }}</p>
+                        </mat-grid-tile>
+                        </div>
+                        <mat-grid-tile>
+                          <div fxLayout="row" fxLayoutAlign="end space-around">
+                            <button mat-icon-button class="custom-icon-button mat-flat-button" (click)="onButtonClick(tool.id)" [matMenuTriggerFor]="menu">
+                              <mat-icon>more_vert</mat-icon>
+                            </button>
+                            <mat-menu #menu="matMenu">
+                              <button mat-icon-button mat-menu-item (click)="onMenuClickStatus('Published', tool.id)">Publish <mat-icon>login</mat-icon></button>
+                              <button mat-icon-button mat-menu-item (click)="onMenuClickUpdate(tool.id)">Edit <mat-icon>edit</mat-icon></button>
+                              <button mat-icon-button mat-menu-item (click)="onMenuClick('Delete', tool.id)">Delete <mat-icon>delete</mat-icon></button>
+                            </mat-menu>
+                          </div>
+                        </mat-grid-tile>
+                        </mat-grid-list>
+                      </mat-card-content>
+                    </mat-card>
+                    <br>
+                }
+            </div>
+            <br>
+          </div>
+      </mat-tab>
+      <mat-tab label="All Reservations">
+        <br>
+        <mat-card class="border-form">
+          <mat-card-content>Simple card</mat-card-content>
+        </mat-card>
+        <br>
+      </mat-tab>
   </mat-tab-group>

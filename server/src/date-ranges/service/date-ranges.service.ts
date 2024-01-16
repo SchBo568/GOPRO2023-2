@@ -27,7 +27,7 @@ export class DateRangesService {
         }
     }
 
-    async getDateRangesByToolId(id: number): Promise<Tool[] | any> {
+    async getDateRangesByToolId(id: number): Promise<DateRange[] | any> {
         const tool = this.toolService.getTool(id)
         if(tool) {
             const toolArray = this.dateRangeRepo.find({where: {tool: {PK_tool_id: (await tool).PK_tool_id}}})

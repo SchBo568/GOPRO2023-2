@@ -4,6 +4,7 @@ import { Review } from 'src/typeorm/entities/Review';
 import { CreateReviewDto } from 'src/dtos/createReview.dto';
 import { CreateRatingDto } from 'src/dtos/createRating.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { UpdateReviewDto } from 'src/dtos/updateReviewDto';
 
 
 @Controller('reviews')
@@ -44,6 +45,7 @@ export class ReviewsController {
 
   /*@Patch(':id')
   update(@Param('id') id: string, @Body() updateReviewDto: UpdateReviewDto) {
+
     return this.reviewsService.update(+id, updateReviewDto);
   }*/
 

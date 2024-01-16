@@ -1,9 +1,9 @@
-import { Component, inject } from '@angular/core';
+import { Component, Inject, inject } from '@angular/core';
 import { CommonModule, DatePipe, JsonPipe } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
-import { DateAdapter, MatNativeDateModule } from '@angular/material/core';
+import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DATE_LOCALE, MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
 import { MatChipEvent, MatChipInputEvent, MatChipsModule} from '@angular/material/chips';
 import {MatIconModule} from '@angular/material/icon';
@@ -20,13 +20,20 @@ import { GetKiosks } from '../models/GetKiosks';
 import { CategoryService } from '../../ApiServices/CategoryService';
 import { GetCategories } from '../models/GetCategories';
 import { ImageService } from '../../ApiServices/ImageService';
-import { RangeDates } from './RangeDates.dto';
 import { CreateToolDto } from '../models/CreateTool';
 import { ToolService } from '../../ApiServices/ToolService';
 import { GetToolDto } from '../models/GetTool';
 import { DateRangeService } from '../../ApiServices/DateRangeService';
 import { CreateDateRangeDto } from '../models/CreateDateRange';
-//import { ImageService } from '../../ApiServices/ImageService';
+import { RangeDates } from '../add-tool/RangeDates.dto';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { DialogData } from '../user-details/user-details.component';
+import { HttpClientModule } from '@angular/common/http';
+import { GetToolPictureDto } from '../models/GetToolPicture';
+import { DateAdapter } from '@angular/material/core';
+import { MatMomentDateModule, MomentDateAdapter } from '@angular/material-moment-adapter';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+import { GetDateRangeDto } from '../models/GetDateRange';
 
 interface Condition {
   value: string;
@@ -40,29 +47,47 @@ interface Kiosk {
 
 interface ImageSnippet {
   src?: string | null, 
-  file?: File | null
+  file?: File  | null,
+  blob?: Blob | null
 }
 
 interface ImageBody {
-  file?: File | null,
+  file?: File |  Blob | null,
   toolId?: number | null
 }
 
+interface EditToolDialogData {
+  token?: string,
+  username?: string,
+  tool?: GetToolDto,
+  pictures?: GetToolPictureDto[],
+  ranges?: GetDateRangeDto[]
+}
+
+interface RangeDatesBody {
+  id: number | null;
+  start: Date;
+  end: Date;
+  from: string;
+}
+
 @Component({
-  selector: 'app-add-tool',
+  selector: 'app-modal-edit-tool',
   standalone: true,
-  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatChipsModule, MatIconModule, MatCardModule,MatSelectModule,
+  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatChipsModule, MatIconModule, MatCardModule,MatSelectModule, MatDialogTitle, MatDialogContent,HttpClientModule,
     MatDatepickerModule,
     FormsModule,
     ReactiveFormsModule,
     JsonPipe,
-    MatNativeDateModule,MatButtonModule, MatDatepickerModule],
-  providers: [KioskService, CategoryService, ImageService, ToolService, DateRangeService, DatePipe],
-  templateUrl: './add-tool.component.html',
-  styleUrl: './add-tool.component.scss'
+    MatNativeDateModule,MatButtonModule],
+  providers: [KioskService, CategoryService, ImageService, ToolService, DateRangeService, DatePipe, UserService, MatDatepickerModule,
+    MatNativeDateModule],
+  templateUrl: './modal-edit-tool.component.html',
+  styleUrl: './modal-edit-tool.component.scss'
 })
-export class AddToolComponent {
-  filteredDates: [RangeDates] = [{start: new Date ('2023-10-24'), end: new Date ('2023-10-24')}];
+export class ModalEditToolComponent {
+  hide = true
+  filteredDates: [RangeDatesBody] = [{id: null, start: new Date ('2023-10-24'), end: new Date ('2023-10-24'), from: "Tester"}];
   today: Date = new Date();
   isMobile: boolean = false;
   isLoggedIn?: boolean;
@@ -78,7 +103,7 @@ export class AddToolComponent {
 
   kiosks: Kiosk[] = []
   categories: Kiosk[] = []
-  selectedFile: ImageSnippet = {src: null, file: null};
+  selectedFile: ImageSnippet = {src: null, file: null, blob: null};
 
   sessionStorageService: SessionStorageService = new SessionStorageService;
 
@@ -88,8 +113,9 @@ export class AddToolComponent {
     condition: "Very Good", 
     description: "Test", 
     kioskPKLocationId: 1, 
-    name: "Test", rental_rate: 
-    10, status: "registered", 
+    name: "Test", 
+    rental_rate: 10, 
+    status: "registered", 
     userPKUsername:"test"
   };
 
@@ -101,24 +127,40 @@ export class AddToolComponent {
     private imageService: ImageService,
     private toolService: ToolService,
     private dateRangeService: DateRangeService,
-    private datePipe: DatePipe
+    private datePipe: DatePipe,
+    private fb: FormBuilder,
+    public dialogRef: MatDialogRef<ModalEditToolComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: EditToolDialogData
     //private imageService: ImageService
   ) {}
+
+  onCancelClick(): void {
+    this.dialogRef.close();
+  }
 
   mediaSub: Subscription = new Subscription;
 
   addOnBlur = true;
-  //readonly separatorKeysCodes = [ENTER, COMMA] as const;
 
   announcer = inject(LiveAnnouncer);
 
-  remove(date: RangeDates): void {
+  remove(date: RangeDatesBody): void {
+
     const index = this.filteredDates.indexOf(date);
 
     if (index >= 0) {
-      this.filteredDates.splice(index, 1);
-
-      this.announcer.announce(`Removed ${date}`);
+      if(date.id == null){
+        this.filteredDates.splice(index, 1);
+        this.announcer.announce(`Removed ${date}`);
+        console.log(date.id)
+      } else {
+        console.log(date.id)
+        this.dateRangeService.deleteDateRangeById(date.id).subscribe((response: any) => {
+          console.log(response)
+          this.filteredDates.splice(index, 1);
+          this.announcer.announce(`Removed ${date}`);
+        })
+      }
     }
   }
 
@@ -129,17 +171,20 @@ export class AddToolComponent {
       var containsDuplicates = this.hasDuplicates(this.filteredDates);
       console.log("Duplicates: "+containsDuplicates)
       if(!containsDuplicates) {
-        this.filteredDates.push(new RangeDates(this.range.value.start!,this.range.value.end!));
+        this.filteredDates.push({id: null, start: this.range.value.start!,end: this.range.value.end!, from: "local"});
       }
     }
   }
 
   // Form controls initialization for user details
-  rentalRate = new FormControl("", [Validators.pattern(/^[0-9]+(\.[0-9]+)?$/)]);
-  toolName = new FormControl("", [Validators.required]);
-  description = new FormControl("", [Validators.required]);
-  condition?: Condition;
-  selectedCondition?: string 
+  rentalRate = new FormControl<number>(this.data.tool?.rental_rate ?? 1, [Validators.pattern(/^[0-9]+(\.[0-9]+)?$/)]);
+  toolName = new FormControl(this.data.tool?.name, [Validators.required]);
+  description = new FormControl(this.data.tool?.description, [Validators.required]);
+  condition = new FormControl<Condition>({
+    value: this.data.tool?.condition ?? "Very Good", 
+    viewValue: this.data.tool?.condition ?? "Very Good"}, [Validators.required]
+    )
+  //condition.value = this.data.tool?.condition;
   kiosk?: Kiosk;
   category?: Kiosk;
 
@@ -184,13 +229,36 @@ export class AddToolComponent {
 
     if (this.sessionStorageService.getUser() != null) {
       this.isLoggedIn = true;
-      console.log("ffffffffff")
+      console.log(this.data)
       await this.setListKiosk()
       await this.setListCategories()
+      await this.getToolPictures()
+      await this.getToolRanges()
     } else {
       this.isLoggedIn = false;
     }
   }
+
+  async getToolPictures() {
+    for(var i = 0; i < this.data.pictures?.length!; i++) {
+      const imageData = await this.imageService.getImage(this.data.pictures![i].imageUrl ?? "d").toPromise();
+      const imageBlob = new Blob([imageData!], { type: 'image/jpeg' });
+      const imageFile = blobToFile(imageBlob, "fromDatabase-");
+      this.uploadedFiles.push({url: URL.createObjectURL(imageBlob), file: imageBlob, from: "DB"})
+    }
+  }
+
+  async getToolRanges() {
+    if(this.data.ranges)
+    for(var i = 0; i < this.data.ranges?.length!; i++) {
+      this.filteredDates.push({id: this.data.ranges[i].PK_dateRange_id ?? 1, start: new Date (this.data.ranges[i].start ?? new Date()), end: new Date(this.data.ranges[i].end ?? new Date()), from: "DB"});
+    }
+  }
+
+  formatDate(date: Date): string {
+    return this.datePipe.transform(date, 'dd/MM/yyyy') || '';
+  }
+  
 
   async setListKiosk() {
     this.kioskService.getKiosks().subscribe((response: GetKiosks[]) => {
@@ -210,7 +278,7 @@ export class AddToolComponent {
     })
   }
 
-  uploadedFiles: { url: string, file: File }[] = [];
+  uploadedFiles: { url: string, file: File | Blob | null, from: string | null }[] = [];
 
   processFiles(imageInput: HTMLInputElement): void {
     console.log("Called from processFiles " + imageInput);
@@ -223,7 +291,7 @@ export class AddToolComponent {
         reader.onload = (e: any) => {
           // Logging the data URL obtained from FileReader
           console.log("Data URL:", e.target.result);
-          this.uploadedFiles.push({ url: e.target.result, file });
+          this.uploadedFiles.push({ url: e.target.result, file, from: "local" });
         };
         reader.readAsDataURL(file);
       }
@@ -234,30 +302,30 @@ export class AddToolComponent {
     this.uploadedFiles.splice(index, 1);
   }
 
-  createTool() {
+  updateTool() {
     this.proTool.name = this.toolName.value ?? "t";
     this.proTool.description = this.description.value ?? "t";
-    this.proTool.rental_rate = parseFloat(this.rentalRate.value || '1') ?? 9999991;
-    this.proTool.condition = this.selectedCondition;
-    this.proTool.kioskPKLocationId = this.kiosk?.value ?? 1;
-    this.proTool.categoryId = this.category?.value ?? 1;
-    this.proTool.code = this.generateRandomCode(8);
+    this.proTool.rental_rate = parseFloat(this.rentalRate.value + "") ?? 9999991;
+    this.proTool.condition = this.condition.value?.value!;
+    this.proTool.kioskPKLocationId = this.kiosk?.value;
+    this.proTool.categoryId = this.category?.value;
+    this.proTool.code = this.data.tool?.code;
     this.proTool.status = "Registered";
     this.proTool.userPKUsername = this.sessionStorageService.getUser()?.PK_username;
 
     if(this.toolName.valid && this.description.valid && this.rentalRate.valid) {
       const token = this.sessionStorageService.getUser()?.access_token ?? "0000000000";
       this.toolService.setToken(token);
-      this.toolService.createTool(this.proTool).subscribe((response: GetToolDto) => {
-        console.log(response.PK_tool_id)
-        this.upload(response.PK_tool_id)
-        this.createDateRange(response.PK_tool_id)
+      this.toolService.editToolById(this.data.tool?.PK_tool_id ?? 1, this.proTool).subscribe(async (response: any) => {
+        console.log(response);
+        const newFilteredDate: RangeDatesBody[] = this.filteredDates.filter(filteredDates => filteredDates.from === "local")
+        console.log(newFilteredDate)
+        if(newFilteredDate.length != 0) {
+          this.updateDateRange(response.PK_tool_id, newFilteredDate)
+        }
+        //this.upload(response.PK_tool_id)
       })
     }
-  }
-
-  onConditionChange(conditionValue: string) {
-    this.selectedCondition = conditionValue;
   }
 
   generateRandomCode(length: number): string {
@@ -274,24 +342,25 @@ export class AddToolComponent {
     this.imageService.setToken(this.sessionStorageService.getUser()?.access_token ?? "0000000000")
     if(this.uploadedFiles.length !== 0) {
         for(var i = 0; i< this.uploadedFiles.length; i++){
-          this.imageService.uploadFile(this.uploadedFiles[i].file, toolId ?? 1).subscribe((response: string) => {
+          if(this.uploadedFiles[i].file instanceof File) {
+          const file: File = this.uploadedFiles[i].file as File;
+          this.imageService.uploadFile(file, toolId ?? 1).subscribe((response: string) => {
           console.log(response)
         })
+        }
         }
     }
   }
 
-
-
   dateRange: CreateDateRangeDto = {}
 
-  createDateRange(toolId?: number): void {
+  updateDateRange(toolId: number, ranges: RangeDatesBody[]): void {
     this.dateRangeService.setToken(this.sessionStorageService.getUser()?.access_token ?? "0000000000")
-    console.log(this.filteredDates.length)
-    if(this.filteredDates.length !== 1) {
-      for(var i = 1; i <= this.filteredDates.length; i++){
-        this.dateRange.start = this.datePipe.transform(new Date (this.filteredDates[i].start), 'yyyy-MM-dd') ?? "d";
-        this.dateRange.end = this.datePipe.transform(new Date (this.filteredDates[i].end), 'yyyy-MM-dd') ?? "dd";
+    console.log(ranges)
+    if(ranges.length != 0) {
+      for(var i = 0; i <= ranges.length; i++){
+        this.dateRange.start = this.datePipe.transform(new Date (ranges[i].start), 'yyyy-MM-dd') ?? "d";
+        this.dateRange.end = this.datePipe.transform(new Date (ranges[i].end), 'yyyy-MM-dd') ?? "dd";
         this.dateRange.toolId = toolId;
         this.dateRangeService.createDateRange(this.dateRange).subscribe((response: string) => {
           console.log(response)
@@ -299,4 +368,13 @@ export class AddToolComponent {
       }
     }
   }
+}
+
+function blobToFile(blob: Blob, fileName: string) {
+  const options = {
+    type: blob.type,
+    lastModified: Date.now(),
+  };
+
+  return new File([blob], fileName, options);
 }

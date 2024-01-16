@@ -21,6 +21,10 @@ export class UpdateToolDto {
   @IsOptional()
   condition: string;
 
+  @IsNumber()
+  @IsOptional()
+  categoryPKCategoryId: number;
+
   @IsString()
   @IsOptional()
   userPKUsername: string;

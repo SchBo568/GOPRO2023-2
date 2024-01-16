@@ -1,3 +1,6 @@
+import { GetCategories } from "./GetCategories";
+import { GetKiosks } from "./GetKiosks";
+
 export interface GetToolDto {
     PK_tool_id?: number,
     name?: string,
@@ -7,8 +10,8 @@ export interface GetToolDto {
     condition?: string,
     code?: string,
     user?: any,
-    kiosk?: any,
-    category?: any,
+    kiosk?: GetKiosks,
+    category?: GetCategories,
     pictures?: any,
     dateRanges?: any,
     rentings?: any

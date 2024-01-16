@@ -1,4 +1,5 @@
 <div *ngIf="isLoggedIn">
+    <div fxLayout="column" fxLayoutAlign="center" class="margin-mat-card">
     <mat-card class="border-title">
     <h1>Add Tool:</h1>
     </mat-card>
@@ -53,11 +54,13 @@
                     <mat-icon matSuffix>money</mat-icon>
                 </mat-form-field>
                 <mat-form-field appearance="outline" class="form-field">
-                  <mat-label>Condition</mat-label>
-                  <mat-select [(ngModel)]="selectedCondition" (ngModelChange)="onConditionChange($event)" required>
-                    <mat-option *ngFor="let condition of conditions" [value]="condition.value">{{condition.viewValue}}</mat-option>
-                  </mat-select>
-                </mat-form-field>
+                    <mat-label>Condition</mat-label>
+                    <mat-select [formControl]="condition" required>
+                      <mat-option *ngFor="let condition of conditions" [value]="condition.value">
+                        {{ condition.viewValue }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
                 <mat-form-field appearance="outline" class="form-field">
                     <mat-label>Choose Kiosk</mat-label>
                     <mat-select [ngModel]="kiosk" required>
@@ -84,9 +87,9 @@
                         <input matStartDate formControlName="start" placeholder="Start date">
                         <input matEndDate formControlName="end" placeholder="End date">
                         </mat-date-range-input>
-                        <mat-hint>DD/MM/YYYY</mat-hint>
+                        <mat-hint>YYYY-MM-DD</mat-hint>
                         <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                        <mat-date-range-picker #picker></mat-date-range-picker>
+                        <mat-date-range-picker #picker touchUi></mat-date-range-picker>
                         @if (range.controls.start.hasError('matStartDateInvalid')) {
                         <mat-error>Invalid start date</mat-error>
                         }
@@ -106,7 +109,7 @@
                             <mat-chip-row
                             (removed)="remove(date)"
                             [editable]="false">
-                            {{date.start + " - " + date.end}}
+                            {{formatDate(date.start) + " - " + formatDate(date.end)}}
                             <button matChipRemove [attr.aria-label]="'remove ' + date.start">
                                 <mat-icon>cancel</mat-icon>
                             </button>
@@ -116,11 +119,13 @@
                         </mat-chip-grid>
                     </div>
                     </mat-form-field>
-            <button class="myButton" mat-button (click)="createTool()"> Create Tool </button>
+            <button class="myButton" mat-button (click)="updateTool()"> Update Tool </button>
         </mat-card>
     </div>
+</div>
 
     <div *ngIf="isMobile" fxLayout="column" fxLayoutAlign="space-around center" >
+        <div fxLayout="column" fxLayoutAlign="center" class="margin-mat-card">
             <mat-card class="border-form-mobile">
               <mat-form-field appearance="outline" class="form-field">
                 <mat-label>Name of the tool</mat-label>
@@ -202,7 +207,7 @@
                     <input matStartDate formControlName="start" placeholder="Start date">
                     <input matEndDate formControlName="end" placeholder="End date">
                     </mat-date-range-input>
-                    <mat-hint>DD/MM/YYYY</mat-hint>
+                    <mat-hint>YYYY-MM-DD</mat-hint>
                     <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
                     <mat-date-range-picker #picker></mat-date-range-picker>
                     @if (range.controls.start.hasError('matStartDateInvalid')) {
@@ -224,7 +229,7 @@
                         <mat-chip-row
                         (removed)="remove(date)"
                         [editable]="false">
-                        {{date.start + " - " + date.end}}
+                        {{formatDate(date.start) + " - " + formatDate(date.end)}}
                         <button matChipRemove [attr.aria-label]="'remove ' + date.start">
                             <mat-icon>cancel</mat-icon>
                         </button>
@@ -234,13 +239,15 @@
                     </mat-chip-grid>
                 </div>
                 </mat-form-field>
-        <button class="myButton" mat-button (click)="createTool()"> Create Tool </button>
+        <button class="myButton" mat-button (click)="updateTool()"> Update Tool </button>
             </mat-card>
         </div>
     <div>
+    </div>
     </div>
 </div>
 <div *ngIf="!isLoggedIn">
     <h1>Unauthorized, you have to login</h1>
 </div>
+
 

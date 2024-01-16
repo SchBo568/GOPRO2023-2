@@ -71,6 +71,7 @@ export class ToolsService {
     }
 
     editTool(id:number, editTool: Tool): Promise<UpdateResult> {
+        console.log(editTool.status)
         return this.toolRepo.update(id, editTool);
     }
 

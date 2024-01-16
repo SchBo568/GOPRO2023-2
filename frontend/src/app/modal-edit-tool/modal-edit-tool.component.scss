@@ -1,3 +1,10 @@
+.margin-mat-card {
+    padding-top: 2.5%;
+    padding-bottom: 2.5%;
+    padding-left: 2.5%;
+    padding-right: 2.5%;
+  }
+
 .example-chip-list {
     width: 100%;
   }
@@ -86,7 +93,7 @@ mat-form-field {
 
 .image-upload-container {
   display: inline-block;
-  padding: 10px 20px;
+  padding: 10px 10px;
   border: 2px solid #ccc;
   border-radius: 4px;
   cursor: pointer;
@@ -140,6 +147,11 @@ mat-form-field {
   cursor: pointer;
   font-size: 10px;
   z-index: 1;
+}
+
+::ng-deep .cdk-overlay-container {
+  position: fixed !important;
+  z-index: 100000 !important; /* set value you need */
 }
 
 

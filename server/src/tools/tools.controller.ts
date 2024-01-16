@@ -11,11 +11,14 @@ import { DeleteResult, UpdateResult } from 'typeorm';
 import { UsersService } from 'src/users/users.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { log } from 'console';
+import { CategoriesService } from 'src/categories/service/categories.service';
+import { UpdateToolDto } from 'src/dtos/updateToolDto.dto';
+import { Category } from 'src/typeorm/entities/Category';
 
 @Controller('tools')
 export class ToolsController {
 
-    constructor(private toolsService: ToolsService) {}
+    constructor(private toolsService: ToolsService, private usersService: UsersService, private kiosksService: KiosksService, private categoriesService: CategoriesService) {}
 
     async sendResponse(data: Tool[] | null, resource: string){
 
@@ -85,18 +88,20 @@ export class ToolsController {
     }
 
     @Put(':id')
-    async updateTool(@Param('id') id: number, @Body() updateTool: CreateToolDto)/*: Promise<UpdateResult> */{
-        /*const user =  await this.usersService.findUserByUsername(updateTool.userPKUsername)
-        const kiosk:Kiosk = await this.kiosksService.getKiosk(updateTool.kioskPKLocationId).kiosk;
+    async updateTool(@Param('id') id: number, @Body() updateTool: UpdateToolDto)/*: Promise<UpdateResult> */{
+        const user =  await this.usersService.findUserByUsername(updateTool.userPKUsername);
+        const kiosk:Kiosk = await this.kiosksService.getKiosk(updateTool.kioskPKLocationId);
+        const category: Category = await this.categoriesService.getCategoryById(updateTool.categoryPKCategoryId);
         const newTool:Tool = new Tool();
         newTool.name = updateTool.name;
         newTool.description = updateTool.description;
-        newTool.availability = updateTool.availability;
+        newTool.status = updateTool.status;
         newTool.rental_rate = updateTool.rental_rate;
         newTool.condition = updateTool.condition;
+        newTool.category = category;
         newTool.user = user[0];
         newTool.kiosk = kiosk;
-        return this.toolsService.editTool(id, newTool);    */
+        return this.toolsService.editTool(id, newTool);    
     }
 
     @UseGuards(AuthGuard)

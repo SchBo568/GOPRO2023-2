@@ -38,7 +38,7 @@ export class ImageService {
     return this.http.post(apiUrl, requestBody, { responseType: 'blob' });
   }
 
-  getPicturesByToolId(toolId: number): Observable<GetToolPictureDto[]> {
+  async getPicturesByToolId(toolId: number): Promise<Observable<GetToolPictureDto[]>> {
     const headers = this.getHeaders();
     return this.http.get<any>(`${this.apiUrl}/tool/${toolId}`, {headers});
   }

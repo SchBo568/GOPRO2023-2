@@ -9,12 +9,12 @@ import { ToolsService } from 'src/tools/tools.service';
 
 @Injectable()
 export class ReviewsService {
-  constructor(@InjectRepository(Review) private reviewRepo: Repository<Review>, private usersService: UsersService ,private toolsService: ToolsService) {}
+  constructor(@InjectRepository(Review) private reviewRepo: Repository<Review>, private usersService: UsersService, private toolsService: ToolsService) { }
 
   async createRating(createRating: CreateRatingDto): Promise<Review | any> {
     const user1 = await this.usersService.findUserByUsername(createRating.reviewedUserId)
     const user2 = await this.usersService.findUserByUsername(createRating.reviewingUserId)
-    if(user1 && user2){
+    if (user1 && user2) {
       const review = new Review()
       review.stars = createRating.stars;
       review.comment = createRating.comment;
@@ -48,7 +48,7 @@ export class ReviewsService {
   async createReview(createReview: CreateReviewDto) {
     const user = await this.usersService.findUserByUsername(createReview.reviewingUserId)
     const tool = await this.toolsService.getTool(createReview.toolId);
-    if(user && tool){
+    if (user && tool) {
       const review = new Review()
       review.stars = createReview.stars;
       review.comment = createReview.comment;
@@ -62,8 +62,8 @@ export class ReviewsService {
         "code": 200,
         "message": ["Review added successfully"]
       }
-    } else if (!tool){
-      return{
+    } else if (!tool) {
+      return {
         "status": "ERROR",
         "code": 404,
         "message": ["The tool does not exist"]
@@ -77,16 +77,33 @@ export class ReviewsService {
     }
   }
 
-  async getRatingByUsername(username: string): Promise<Review[]> {
-    return this.reviewRepo.find({
-      where: {reviewedUser: {PK_username: username}},
-      relations: ['reviewingUser'],
-    })
+  async getRatingByUsername(username: string) {
+    if ((await this.usersService.findUserByUsername(username)).length == 0) {
+      return {
+        "status": "ERROR",
+        "code": 404,
+        "message": ["The user does not exist"]
+      }
+    }
+    else {
+      let ratings = this.reviewRepo.find({
+        where: { reviewedUser: { PK_username: username } },
+        relations: ['reviewingUser'],
+      })
+
+      return {
+        "status": "OK",
+        "code": 200,
+        "ratings": ratings
+      }
+    }
+
+
   }
 
   async getReviewByToolId(toolId): Promise<Review[]> {
-     return this.reviewRepo.find({
-      where: {tool: {PK_tool_id: toolId}},
+    return this.reviewRepo.find({
+      where: { tool: { PK_tool_id: toolId } },
       relations: ['reviewingUser'],
     })
   }
@@ -96,14 +113,42 @@ export class ReviewsService {
   }
 
   findOne(id: number) {
-    return this.reviewRepo.findOne({where: {PK_review_id: id}})
+    return this.reviewRepo.findOne({ where: { PK_review_id: id } })
   }
 
   update(id: number, newReview: Review) {
-    return this.reviewRepo.update(id, newReview)
+    if(this.reviewRepo.findOne({ where: { PK_review_id: id } }) == null){
+      return {
+        "status": "ERROR",
+        "code": 404,
+        "message": ["The review does not exist"]
+      }
+    }
+    else {
+      this.reviewRepo.update(id, newReview)
+      return {
+        "status": "OK",
+        "code": 200,
+        "message": ["Review updated successfully"]
+      }
+    }
   }
 
   remove(id: number) {
-    return this.reviewRepo.delete(id)
+    if(this.reviewRepo.findOne({ where: { PK_review_id: id } }) == null){
+      return {
+        "status": "ERROR",
+        "code": 404,
+        "message": ["The review does not exist"]
+      }
+    }
+    else {
+      this.reviewRepo.delete(id)
+      return {
+        "status": "OK",
+        "code": 200,
+        "message": ["Review deleted successfully"]
+      }
+    }
   }
 }

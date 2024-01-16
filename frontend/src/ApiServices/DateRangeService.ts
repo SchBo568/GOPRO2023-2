@@ -6,6 +6,7 @@ import { ResponseStatus } from '../app/models/ResponseStatus';
 import { UserSession } from '../app/models/UserSession';
 import { CreateUserDto } from '../app/models/CreateUser';
 import { CreateDateRangeDto } from '../app/models/CreateDateRange';
+import { DateRange } from '@angular/material/datepicker';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,16 @@ export class DateRangeService {
   createDateRange(dateRange: CreateDateRangeDto) : Observable<any> {
     const headers = this.getHeaders();
     return this.http.post<any>(`${this.apiUrl}`, dateRange, {headers});
+  }
+
+  getDateRangesByToolId(toolId: number): Observable<CreateDateRangeDto[]> {
+    const headers = this.getHeaders();
+    return this.http.get<any>(`${this.apiUrl}/${toolId}`, {headers})
+  }
+
+  deleteDateRangeById(id: number): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.delete<any>(`${this.apiUrl}/${id}`, {headers})
   }
 
   // register(user: CreateUserDto): Observable<ResponseStatus> {

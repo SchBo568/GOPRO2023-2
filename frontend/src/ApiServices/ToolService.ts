@@ -39,9 +39,14 @@ export class ToolService {
     return this.http.get<any>(`${this.apiUrl}/owner/${username}`, {headers})
   }
 
-  editToolById(id: number, tool: CreateToolDto): Observable<any> {
+  async getToolById(toolId: number): Promise<Observable<GetToolDto>> {
     const headers = this.getHeaders();
-    return this.http.put<any>(`${this.apiUrl}/${id}`, {tool}, {headers})
+    return this.http.get<any>(`${this.apiUrl}/${toolId}`, {headers})
+  }
+
+  editToolById(id: number, tool: CreateToolDto | Object): Observable<any> {
+    const headers = this.getHeaders();
+    return this.http.put<any>(`${this.apiUrl}/${id}`, tool, {headers})
   }
 
 //   login(username: string, password: string) : Observable<UserSession> {
